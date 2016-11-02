@@ -37,7 +37,7 @@ public class BOCSourceHandler extends Thread{
 				line++;
 				writer_File_RecordPosition.seek(0L);
 				byte[] bytes = new byte[50];
-				byte[] breakPointFile_bytes = (breakPointFile.getName()+" "+line).getBytes();
+				byte[] breakPointFile_bytes = (breakPointFile.getAbsolutePath()+" "+line).getBytes();
 				int length =breakPointFile_bytes.length;
 				for(int y=0;y<length;y++){
 					bytes[y]=breakPointFile_bytes[y];
@@ -77,7 +77,7 @@ public class BOCSourceHandler extends Thread{
 						//记录读取进度，便于断点续读
 						writer_File_RecordPosition.seek(0L);
 						byte[] bytes = new byte[50];
-						byte[] breakPointFile_bytes = (file.getName()+" "+count).getBytes();
+						byte[] breakPointFile_bytes = (file.getAbsolutePath()+" "+count).getBytes();
 						int length =breakPointFile_bytes.length;
 						for(int y=0;y<length;y++){
 							bytes[y]=breakPointFile_bytes[y];
@@ -116,15 +116,21 @@ public class BOCSourceHandler extends Thread{
 		 */
 		readFrombreakpint();
 		//将采集目录下有的文件先进行一次升序排序
+		int count = 0;
+	//	System.out.println("第"+count+"次排序：");
 		File[] files = myFileUtil.listAndSort(FlumeContext.Collect_Dir);
+	//	TestUtil.printFiles(files);
 		while (true){
 			//按顺序读取
 			readFiles(files);
+			count++;
+	//		System.out.println("第"+count+"次排序：");
 			files = myFileUtil.listAndSort(FlumeContext.Collect_Dir);
-			if(files==null){
+	//		TestUtil.printFiles(files);
+			if(files.length==0){
 				System.out.println("completed all files, waiting for more file");
 				try {
-					sleep(1000);
+					sleep(10000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -135,6 +141,6 @@ public class BOCSourceHandler extends Thread{
 	public static void main(String[] args) {
 		BOCSourceHandler handler = new BOCSourceHandler();
 		handler.start();
-		System.out.println("is ok");
+	//	System.out.println("is ok");
 	}
 }
