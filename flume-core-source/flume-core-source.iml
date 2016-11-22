@@ -10,14 +10,14 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../apache-flume-1.6.0-bin/lib" />
+          <root url="file://$MODULE_DIR$/../../apache-flume-1.6.0-bin/lib" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/../apache-flume-1.6.0-bin/lib" />
+          <root url="file://$MODULE_DIR$/../../apache-flume-1.6.0-bin/lib" />
         </SOURCES>
-        <jarDirectory url="file://$MODULE_DIR$/../apache-flume-1.6.0-bin/lib" recursive="false" />
-        <jarDirectory url="file://$MODULE_DIR$/../apache-flume-1.6.0-bin/lib" recursive="false" type="SOURCES" />
+        <jarDirectory url="file://$MODULE_DIR$/../../apache-flume-1.6.0-bin/lib" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/../../apache-flume-1.6.0-bin/lib" recursive="false" type="SOURCES" />
       </library>
     </orderEntry>
   </component>

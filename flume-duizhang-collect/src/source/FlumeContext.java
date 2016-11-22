@@ -14,4 +14,5 @@ public class FlumeContext {
 	public static final int RECORD_LENGTH = 15;
 	//用以存储 程序采集的开始文件位置：文件内容包括一个文件名，程序将从该文件开始向下采集
 	public static final String Set_StartPoint = "E:\\test\\flume-test\\Set_StartPoint";
+
 }

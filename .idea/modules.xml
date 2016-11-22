@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/flume-core-source/flume-core-source.iml" filepath="$PROJECT_DIR$/flume-core-source/flume-core-source.iml" />
       <module fileurl="file://$PROJECT_DIR$/flume-duizhang-collect/flume-duizhang-collect.iml" filepath="$PROJECT_DIR$/flume-duizhang-collect/flume-duizhang-collect.iml" />
       <module fileurl="file://$PROJECT_DIR$/myflumeproject.iml" filepath="$PROJECT_DIR$/myflumeproject.iml" />
     </modules>
