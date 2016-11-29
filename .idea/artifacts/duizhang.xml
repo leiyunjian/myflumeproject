@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="duizhang">
+    <output-path>$PROJECT_DIR$/out/artifacts/duizhang</output-path>
+    <root id="archive" name="duizhang.jar">
+      <element id="module-output" name="flume-duizhang-collect" />
+    </root>
+  </artifact>
+</component>

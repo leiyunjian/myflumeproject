@@ -4,6 +4,7 @@ import myutil.*;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,17 +65,73 @@ public class TestUtil {
 	}
 	;
 	class MyException extends Exception{}
+
 	public static void main(String[] args)  {
 
+		int li = 0xa;
+		int oi = 012;
+		System.out.println(li);
+		System.out.println(oi);
+		for(int i=1;i<=0;i++){
+			System.out.println("for(int i=1;i<=0;i++)");
+		}
+
+//byte类型对应的是asscii码  0对应的是空格
+//		byte[] bytes = new byte[10];
+//		bytes[1] = ' ';
+//		bytes[2] =(byte)97;
+//		System.out.println(bytes);
+//		System.out.println(bytes[0]);
+//		System.out.println(bytes[1]);
+//		System.out.println(bytes[2]);
+//		System.out.println(bytes[3]);
+//		Arrays.fill(bytes, (byte)'a');
+//		System.out.println(bytes[9]);
+//		try {
+//			File file = new File("E:\\test\\RandomAccessFiletest.txt");
+//			file.createNewFile();
+//			RandomAccessFile accessFile = new RandomAccessFile("E:\\test\\RandomAccessFiletest.txt","rw");
+//			byte[] bytes1 = new byte[20];
+//			byte[] loc = "mygod 123".getBytes();
+//			int length = loc.length;
+//			for(int i=0;i<length;i++){
+//				bytes1[i] = loc[i];
+//			}
+//			accessFile.write(bytes1);
+//			String separator = System.getProperty("line.separator");
+//			accessFile.write(separator.getBytes());
+//			accessFile.write(bytes1);
+//
+//			BufferedReader reader = new BufferedReader(new FileReader("E:\\test\\RandomAccessFiletest.txt"));
+//			String record = reader.readLine();
+//			System.out.println(record.split(" ").length);
+//			int i = Integer.parseInt(record.split(" ")[1].trim());
+//			System.out.println(i);
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		String str1 = "nihao";
+//		String str2 = "你好";
+//		System.out.println(str1.length());
+//		System.out.println(str2.length());
+//		byte[] bytes1 = str1.getBytes();
+//		byte[] bytes2 = str2.getBytes();
+//		System.out.println(bytes1.length);
+//		System.out.println(bytes2.length);
+
 	//测试自定义异常：
-		TestUtil testUtil = new TestUtil();
-		testUtil.Method();
+//		TestUtil testUtil = new TestUtil();
+//		testUtil.Method();
 //			try {
 //			testUtil.Method1();
+//				System.out.println("behind exception");
 // 			} catch (MyException e) {
 //			e.printStackTrace();
 //		}
-		System.out.println("behind catch exception");
+//		System.out.println("behind catch exception");
+
 		//测量在一个文件中边写边读
 //			Thread read_Thread = new Thread() {
 //			@Override
@@ -115,7 +172,7 @@ public class TestUtil {
 //						String Date = dateFormat.format(System.currentTimeMillis());
 //						writer.write(Date);
 //						writer.newLine();
-//						writer.flush();
+//						writer.flush(); //在这里flush（）就很重要了
 //							sleep(1000);
 //					}
 //				} catch (FileNotFoundException e) {

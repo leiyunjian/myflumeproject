@@ -1,6 +1,7 @@
 package myutil;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -29,8 +30,8 @@ public class FileUtil {
 			return null;
 		}
 		File File_RecordPosition = new File(FlumeContext.File_RecordPosition);
-		if(!File_RecordPosition.exists()){
-			_LastModified = 0L;
+		if(!File_RecordPosition.exists()||File_RecordPosition.length()==0){
+			_LastModified = 0L;//如果没有已读信息，则_LastModified设置为零，也即是选取所有文件
 			System.out.println("File_RecordPosition not exists,_LastModified:"+_LastModified);
 		}else {
 			try {
@@ -72,12 +73,21 @@ public class FileUtil {
 	}
 	public void publicmethod(){}
 	private void privatemethod(){}
+
 	public static void main(String[] args) {
 		FileUtil util = new FileUtil();
 		String dirpath = "E:\\test\\test";
-		File[] files = util.listAndSort(dirpath);
-		TestUtil.printFiles(files);
+//		File[] files = util.listAndSort(dirpath);
+//		TestUtil.printFiles(files);
 //		files = util.listAndSort(dirpath);
 //		TestUtil.printFiles(files);
+
+		File file1 = new File(dirpath);
+		File[] files1 = file1.listFiles();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:dd");
+		for (File file:files1
+			 ) {
+			System.out.println(file.getName()+" "+dateFormat.format(file.lastModified()));
+		}
 	}
 }
