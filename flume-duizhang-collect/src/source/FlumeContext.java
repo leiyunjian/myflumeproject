@@ -13,7 +13,7 @@ public class FlumeContext {
 	//每一次向channel推送event的数量
 	public static  final int DEFULT_BATCH_SIZE = 30;
 	//采集文件的格式默认正则表达式
-	public static  final String DEFULT_COLLECT_FILE_FARMAT = "*";
+	public static  final String DEFULT_COLLECT_FILE_FARMAT = ".*";
 	public static int RECORD_LENGTH = 15;
 	public static  final int BATCH_SIZE = 30;
 }

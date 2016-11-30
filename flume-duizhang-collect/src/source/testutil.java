@@ -76,6 +76,16 @@ public class TestUtil {
 			System.out.println("for(int i=1;i<=0;i++)");
 		}
 
+		File file = new File("e:\\test\\test.txt");
+		System.out.println(file.getAbsolutePath());
+		try{
+			System.out.println(file.getCanonicalPath());
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+		System.out.println(file.getName());
+		System.out.println(file.getParent());
+		System.out.println(file.getPath());
 //byte类型对应的是asscii码  0对应的是空格
 //		byte[] bytes = new byte[10];
 //		bytes[1] = ' ';

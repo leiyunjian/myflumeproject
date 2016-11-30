@@ -8,33 +8,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.lang.reflect.Array;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by Lei on 2016/10/9.
- * 测试版本：一些参数由FlumeContext类 提供
+ * 可运行版本：
  */
 public class BOCSourceHandler extends Thread{
 	private String collect_Dir;
-	private FileUtil myFileUtil = new FileUtil();
+	private FileUtil file_Unit;
 	private ChannelProcessor channelProcessor;
-	private int bacthSize;
+	private int bacth_Size;
 	private Logger logger;
 	private RandomAccessFile writer_File_RecordPosition;
 	private byte[] position_Bytes;
-
+	private int record_Length;
+	private String collect_File_Format;
 	public BOCSourceHandler(){}
 
-	public BOCSourceHandler(ChannelProcessor channelProcessor,int bacthSize,Logger logger,String collect_Dir){
+	public BOCSourceHandler(ChannelProcessor channelProcessor,int bacthSize,String collect_Dir,int record_Length
+	,String collect_File_Format){
 		this.channelProcessor = channelProcessor;
-		this.bacthSize = bacthSize;
-		//this.logger = logger;
+		this.bacth_Size = bacthSize;
 		this.logger = LoggerFactory.getLogger(BOCSourceHandler.class);
 		this.collect_Dir = collect_Dir;
+		this.record_Length = record_Length;
+		this.collect_File_Format = collect_File_Format;
+		this.file_Unit = new FileUtil(collect_File_Format);
 		File finished_File =new File(FlumeContext.File_finishFile);
 		File position_File = new File(FlumeContext.File_RecordPosition);
 		position_Bytes = new byte[50];
@@ -56,7 +58,6 @@ public class BOCSourceHandler extends Thread{
 	}
 //读取数据，推送到Channel中，line表示从第几行开始读取，file表示读取的文件，
 	private void pushto_Channel(ChannelProcessor channelProcessor,File file,int line,int batch_Size){
-		File collect_Dir = new File(FlumeContext.Collect_Dir);
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String record;
@@ -68,11 +69,11 @@ public class BOCSourceHandler extends Thread{
 			int batchCount = 0;
 			Event event;
 			List<Event> eventList = new ArrayList<Event>();
-			FileUtil fileUtil = new FileUtil();
+			//FileUtil fileUtil = new FileUtil();
 
 			while(true) {//(record = reader.readLine())!=null
 				record = reader.readLine();
-				if (record != null&&record.length()==FlumeContext.RECORD_LENGTH){
+				if (record != null&&record.length()==record_Length){
 
 					line++;
 					batchCount++;
@@ -80,15 +81,16 @@ public class BOCSourceHandler extends Thread{
 					//event = EventBuilder.withBody(record, Charset.forName("UTF-8"));
 					event = EventBuilder.withBody(record.getBytes());
 					eventList.add(event);
-					if (batchCount == bacthSize) {
+					if (batchCount == bacth_Size) {
 						channelProcessor.processEventBatch(eventList);
 						//记录读取进度
 						write_to_positionFile(file,line);
 						batchCount=0;
 						eventList.clear();
-					}//当读到空的时候，如果是当前正在读的文件，则读取线程睡1秒，否则读取结束，进入下个文件
+					}//当读到空的时候，如果当前正在读的文件是最新的文件，则读取线程睡1秒，否则读取结束，进入下个文件
 				}else if(record==null){
-					if(fileUtil.listAndSort(FlumeContext.Collect_Dir).length==0){//没有更新的文件说明它是最后一个文件
+					File last_File =file_Unit.last_File(collect_Dir);
+					if(last_File.getName().equals(file.getName())){//判断当前文件是否是最新的文件
 						if(!eventList.isEmpty()) {
 							channelProcessor.processEventBatch(eventList);
 
@@ -102,12 +104,14 @@ public class BOCSourceHandler extends Thread{
 						}
 					}else{
 						if(eventList.isEmpty()){
+							System.out.println(file.getName()+" out from eventList.isEmpty()");
 							write_to_finishFile(file, line);
 							break;
 						}else {
 							channelProcessor.processEventBatch(eventList);
 							write_to_positionFile(file,line);
 							write_to_finishFile(file, line);
+							System.out.println(file.getName()+" out from !eventList.isEmpty()");
 							break;
 						}
 					}
@@ -127,7 +131,6 @@ public class BOCSourceHandler extends Thread{
 	private void readFrombreakpint(){
 		File file = new File(FlumeContext.File_RecordPosition);
 		if(!file.exists()||file.length()==0){return;}
-		File collect_Dir = new File(FlumeContext.Collect_Dir);
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			//读取断点信息
@@ -137,7 +140,7 @@ public class BOCSourceHandler extends Thread{
 			int lines =Integer.parseInt(record_split[1].trim());
 			File breakPointFile = new File(record_split[0]);
 
-			pushto_Channel(channelProcessor,breakPointFile,lines,FlumeContext.BATCH_SIZE);
+			pushto_Channel(channelProcessor,breakPointFile,lines,bacth_Size);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -147,10 +150,18 @@ public class BOCSourceHandler extends Thread{
 
 
 	private void readFiles(File[] files){
-		if(files==null){return;}
+		if(files.length==0){
+			System.out.println("files is empty");
+			try {
+				sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			return;
+		}
 		for (File file:files
 			 ) {
-			pushto_Channel(channelProcessor,file,0,FlumeContext.BATCH_SIZE);
+			pushto_Channel(channelProcessor,file,0,bacth_Size);
 		}
 
 	}
@@ -193,18 +204,17 @@ public class BOCSourceHandler extends Thread{
 		/*读文件的策略是:
 		  1进行断点续读
 		  2将采集目录下所有的文件先进行一次升序排序（考虑了断点的有无），按顺序读取
-		  3将排序后的文件读取完，再进行排序，再读取。读取filelist时，读取到最后一个文件的时候，等待文件更新数据，
-		  或者产生新的文件。产生了新的文件则filelist读取完成，进行下一轮文件（比在FlumeContext。File_RecordPosition
-		  中记录下来的读取过的文件新的文件）排序和读取，如此反复。
+		  3将排序后的文件读取完，再进行排序，再读取。读取filelist时，读取到最后一个文件的时候，等待文件更新数据
+		  或者产生新的文件。产生了新的文件则filelist读取完成，进行下一轮文件的排序和读取，如此反复。
 		 */
 		//断点续读
 		readFrombreakpint();
 		//将采集目录下有的文件先进行一次升序排序
-		File[] files = myFileUtil.listAndSort(FlumeContext.Collect_Dir);
+		File[] files = file_Unit.listAndSort(collect_Dir);
 		while (true){
 			//按顺序读取
 			readFiles(files);
-			files = myFileUtil.listAndSort(FlumeContext.Collect_Dir);
+			files = file_Unit.listAndSort(collect_Dir);
 		}
 	}
 
