@@ -87,8 +87,6 @@ public class FileUtil {
 		});
 		return dir_Files[dir_Files.length-1];
 	}
-	public void publicmethod(int a,int b){int c = a+b;return;}
-	private void privatemethod(){}
 
 	public static void main(String[] args) {
 		FileUtil util = new FileUtil(".*");
