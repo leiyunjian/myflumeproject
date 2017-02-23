@@ -58,8 +58,11 @@ public class Core_Source_Handle extends Thread{
 	}
 
 	//读取数据，推送到Channel中，line表示从第几行开始读取，file表示读取的文件，
+	//weather_To_Get_Files 表示是否需要更新或者说提取未读取的files【】，该程序中是读取玩一个files【】然后再
+	//更新一个files【】，以供读取
 	private File[] pushto_Channel(ChannelProcessor channelProcessor,File file,int line,int batch_Size,boolean weather_To_Get_Files){
 		File[] new_Files = null;
+		int pointline = line;
 		if(file==null){
 			return new_Files;
 		}
@@ -97,8 +100,8 @@ public class Core_Source_Handle extends Thread{
 					if(weather_To_Get_Files==false){
 						channelProcessor.processEventBatch(eventList);
 						//记录读取进度
-						write_to_positionFile(file,line);
 						write_to_finishFile(file,line);
+						write_to_positionFile(file,line);
 						eventList.clear();
 						break;
 					}else{
@@ -114,7 +117,10 @@ public class Core_Source_Handle extends Thread{
 							logger.info("in "+file.getName()+" wiating for new data 1S");
 							sleep(1000);
 						}else{
-							write_to_finishFile(file,line);
+							//下面这个判断是为了防止断点恰好在一个文件末尾时，将文件重复记录到finishFile。
+							if(pointline<line) {
+								write_to_finishFile(file, line);
+							}
 							break;
 						}
 					}

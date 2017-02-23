@@ -63,7 +63,7 @@ public  class FileUtil {
 			//从第一次目录向下迭代至最后一层，得到所有的目录，储存在一个列表中如果没有则得到null 有问题
 			//如果返回null，后续接不上
 		   for(int i=0;i<num_Of_Dir_Plies-1;i++){
-			   System.out.println("file_List: "+file_List+"file_Format: "+str_List.get(i+1));
+			  // System.out.println("file_List: "+file_List+"file_Format: "+str_List.get(i+1));
 			  file_List =  get_Files(file_List,str_List.get(i+1),true);//从第一层开始迭代。给出符合条件的所有目录
 		   }
 		   if(file_List!=null) {
